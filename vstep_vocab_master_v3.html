@@ -1,0 +1,502 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0f14;--s1:#161920;--s2:#1e2230;--s3:#252a3a;
+  --b1:rgba(255,255,255,0.08);--b2:rgba(255,255,255,0.14);
+  --tx:#e8eaf0;--tx2:#8b90a4;--tx3:#555a70;
+  --gold:#f0c060;--gold2:#d4a030;
+  --blue:#4a9eff;--blue-bg:rgba(74,158,255,0.12);--blue-bd:rgba(74,158,255,0.3);
+  --green:#48c78e;--green-bg:rgba(72,199,142,0.10);--green-bd:rgba(72,199,142,0.3);
+  --red:#f14668;--red-bg:rgba(241,70,104,0.10);--red-bd:rgba(241,70,104,0.3);
+  --amber:#ffb347;--amber-bg:rgba(255,179,71,0.10);--amber-bd:rgba(255,179,71,0.3);
+  --purple:#a78bfa;--purple-bg:rgba(167,139,250,0.10);
+  --teal:#2dd4bf;--teal-bg:rgba(45,212,191,0.10);
+  --r:12px;--rs:8px;
+}
+body{font-family:'Be Vietnam Pro',sans-serif,system-ui;background:var(--bg);color:var(--tx);min-height:100vh}
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap');
+.app{max-width:700px;margin:0 auto;padding:1.5rem 1rem 3rem}
+
+/* Header */
+.hdr{text-align:center;margin-bottom:1.75rem}
+.hdr-title{font-size:24px;font-weight:700;color:var(--tx);margin-bottom:4px}
+.hdr-title span{color:var(--gold)}
+.hdr-sub{font-size:12px;color:var(--tx3);letter-spacing:.05em}
+.pills{display:flex;gap:6px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.hpill{font-size:10px;padding:2px 9px;border-radius:20px;border:.5px solid var(--b2);color:var(--tx3);background:var(--s1)}
+
+/* Tabs */
+.tabs{display:flex;background:var(--s1);border:.5px solid var(--b1);border-radius:var(--r);padding:4px;margin-bottom:1.25rem;gap:3px}
+.tab{flex:1;padding:8px 6px;border:none;background:transparent;color:var(--tx2);font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;border-radius:var(--rs);transition:all .18s;white-space:nowrap}
+.tab.on{background:var(--s3);color:var(--gold)}
+.tab:hover:not(.on){color:var(--tx);background:var(--s2)}
+.panel{display:none}.panel.on{display:block}
+
+/* Stats bar */
+.sbar{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap}
+.sc{display:flex;align-items:center;gap:5px;padding:4px 10px;background:var(--s1);border:.5px solid var(--b1);border-radius:20px;font-size:11px;font-weight:500;color:var(--tx)}
+.sc .l{color:var(--tx3);font-weight:400}
+.sc.g{background:var(--green-bg);border-color:var(--green-bd);color:var(--green)}
+.sc.r{background:var(--red-bg);border-color:var(--red-bd);color:var(--red)}
+.sc.gold{background:rgba(240,192,96,.1);border-color:rgba(240,192,96,.2);color:var(--gold)}
+
+/* Progress */
+.prog{margin-bottom:1rem}
+.prow{display:flex;justify-content:space-between;font-size:11px;color:var(--tx3);margin-bottom:5px}
+.ptrack{height:3px;background:var(--s2);border-radius:2px;overflow:hidden}
+.pfill{height:100%;background:linear-gradient(90deg,var(--blue),var(--gold));border-radius:2px;transition:width .4s}
+
+/* Question card */
+.qcard{background:var(--s1);border:.5px solid var(--b1);border-radius:var(--r);padding:1.25rem 1.25rem 1rem;margin-bottom:.75rem}
+.qbadge{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 9px;border-radius:20px;background:var(--blue-bg);color:var(--blue);margin-bottom:10px}
+.qbadge.am{background:var(--amber-bg);color:var(--amber)}
+.qword{font-size:28px;font-weight:700;color:var(--tx);margin-bottom:3px;line-height:1.2;font-family:'Be Vietnam Pro',sans-serif}
+.qpos{font-size:11px;color:var(--tx3);margin-bottom:1.1rem;font-style:italic}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.ch{display:flex;align-items:center;gap:9px;padding:10px 12px;border:.5px solid var(--b1);border-radius:var(--rs);cursor:pointer;font-family:inherit;font-size:13px;color:var(--tx);background:var(--s2);transition:all .13s;text-align:left;width:100%}
+.ch:hover:not(.dis){border-color:var(--b2);background:var(--s3);transform:translateY(-1px)}
+.ch.ok{background:var(--green-bg);border-color:var(--green-bd);color:var(--green)}
+.ch.ng{background:var(--red-bg);border-color:var(--red-bd);color:var(--red)}
+.ch.dis{cursor:default;transform:none}
+.ck{width:24px;height:24px;border-radius:6px;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--tx2);flex-shrink:0;border:.5px solid var(--b2)}
+.ch.ok .ck{background:rgba(72,199,142,.2);color:var(--green);border-color:rgba(72,199,142,.3)}
+.ch.ng .ck{background:rgba(241,70,104,.2);color:var(--red);border-color:rgba(241,70,104,.3)}
+
+/* Answer Result Panel */
+.ares{margin-top:.9rem;border-radius:var(--rs);overflow:hidden;border:.5px solid var(--b1);display:none}
+.ares.show{display:block;animation:fu .25s ease}
+.ares-hdr{padding:10px 14px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.ares-hdr.ok{background:rgba(72,199,142,.15);color:var(--green)}
+.ares-hdr.ng{background:rgba(241,70,104,.15);color:var(--red)}
+.ares-body{background:var(--s2);padding:14px}
+
+/* Synonym pills */
+.info-block{margin-bottom:12px}
+.info-block:last-child{margin-bottom:0}
+.info-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;display:block}
+.lbl-an{color:var(--green)}.lbl-sy{color:var(--blue)}.lbl-co{color:var(--amber)}.lbl-pa{color:var(--purple)}.lbl-cl{color:var(--teal)}
+.pill-row{display:flex;flex-wrap:wrap;gap:5px}
+.syn-pill{padding:4px 10px;border-radius:20px;font-size:12px;font-weight:500;background:var(--blue-bg);color:var(--blue);border:.5px solid var(--blue-bd)}
+.col-pill{padding:4px 10px;border-radius:20px;font-size:12px;font-style:italic;background:var(--amber-bg);color:var(--amber);border:.5px solid var(--amber-bd)}
+.para-pill{padding:4px 10px;border-radius:20px;font-size:12px;background:var(--purple-bg);color:var(--purple);border:.5px solid rgba(167,139,250,.3)}
+.clause-box{background:var(--s3);border-left:2px solid var(--teal);border-radius:0 6px 6px 0;padding:8px 12px;font-size:13px;font-style:italic;color:var(--tx2);line-height:1.7}
+.tip-box{margin-top:10px;background:rgba(240,192,96,.06);border:.5px solid rgba(240,192,96,.2);border-radius:var(--rs);padding:8px 12px;font-size:11px;color:var(--tx2);line-height:1.6}
+.tip-box strong{color:var(--gold)}
+.an-val{font-size:15px;font-weight:700;color:var(--green)}
+.loading-inline{color:var(--tx3);font-size:12px;display:flex;align-items:center;gap:6px}
+.sp{display:inline-block;width:12px;height:12px;border:1.5px solid var(--tx3);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite}
+
+/* Nav */
+.nav{display:flex;gap:8px;align-items:center;margin-top:.6rem}
+.btn{padding:8px 18px;border:.5px solid var(--b2);border-radius:var(--rs);background:transparent;font-family:inherit;font-size:12px;font-weight:500;color:var(--tx);cursor:pointer;transition:all .13s}
+.btn:hover:not(:disabled){background:var(--s2)}
+.btn:disabled{opacity:.3;cursor:default}
+.btn.pr{background:var(--gold);color:#0d0f14;border-color:var(--gold);font-weight:700}
+.btn.pr:hover{background:#f5cc70}
+.btn.gh{border-color:transparent;color:var(--tx2)}
+.btn.gh:hover{background:var(--s2);color:var(--tx);border-color:transparent}
+.ml{margin-left:auto}
+.kbhint{font-size:10px;color:var(--tx3);text-align:center;margin-top:6px}
+
+/* Result */
+.result{text-align:center;padding:1.5rem .5rem}
+.rscore{font-size:56px;font-weight:700;margin-bottom:5px}
+.rmsg{font-size:14px;color:var(--tx2);margin-bottom:1.5rem}
+.rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:340px;margin:0 auto 1.5rem}
+.rc{background:var(--s1);border:.5px solid var(--b1);border-radius:var(--rs);padding:12px 6px;text-align:center}
+.rn{font-size:22px;font-weight:700}.rl{font-size:10px;color:var(--tx3);margin-top:2px}
+.mlist{text-align:left;max-width:440px;margin:0 auto 1.25rem;background:var(--s1);border:.5px solid var(--b1);border-radius:var(--rs);padding:12px}
+.mt{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.mi{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:.5px solid var(--b1);color:var(--tx)}
+.mi:last-child{border-bottom:none}.mv{color:var(--tx2)}
+.rbtns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+
+/* Flashcard */
+.fcmeta{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem}
+.fccnt{font-size:12px;color:var(--tx2)}
+.fcacts{display:flex;gap:5px}
+.fscene{perspective:900px;height:190px;cursor:pointer;margin-bottom:.75rem;-webkit-tap-highlight-color:transparent}
+.fccard{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .4s cubic-bezier(.4,0,.2,1)}
+.fccard.fl{transform:rotateY(180deg)}
+.fcface{position:absolute;inset:0;backface-visibility:hidden;border:.5px solid var(--b1);border-radius:var(--r);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.25rem;background:var(--s1)}
+.fcback{transform:rotateY(180deg);background:var(--s2);border-color:rgba(240,192,96,.15)}
+.fchint{font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
+.fcw{font-size:24px;font-weight:700;color:var(--tx);text-align:center;margin-bottom:3px}
+.fcp{font-size:11px;color:var(--tx3);font-style:italic;margin-bottom:6px}
+.fctap{font-size:10px;color:var(--tx3);border:.5px solid var(--b1);border-radius:20px;padding:2px 9px;margin-top:6px}
+.fcviet{font-size:20px;font-weight:700;color:var(--gold);text-align:center;margin-bottom:5px}
+.fcesub{font-size:12px;color:var(--tx2)}
+.fcbtns{display:flex;gap:7px;justify-content:center;margin-bottom:.6rem;flex-wrap:wrap}
+.bunk{padding:8px 18px;border:.5px solid var(--red-bd);border-radius:var(--rs);background:var(--red-bg);color:var(--red);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer}
+.bkn{padding:8px 18px;border:.5px solid var(--green-bd);border-radius:var(--rs);background:var(--green-bg);color:var(--green);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer}
+.bunk:hover,.bkn:hover{opacity:.75}
+.dots{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;margin-bottom:.6rem;max-height:55px;overflow:hidden}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--s3);border:.5px solid var(--b2);cursor:pointer;flex-shrink:0;transition:all .13s}
+.dot.kn{background:var(--green);border-color:var(--green)}
+.dot.un{background:var(--red);border-color:var(--red)}
+.dot.cu{box-shadow:0 0 0 2px var(--gold)}
+.fcleg{display:flex;gap:12px;justify-content:center;font-size:11px;color:var(--tx2);flex-wrap:wrap}
+.fcleg span{display:flex;align-items:center;gap:4px}
+.ld{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0}
+
+/* Review */
+.revbanner{background:var(--amber-bg);border:.5px solid var(--amber-bd);border-radius:var(--rs);padding:9px 13px;font-size:12px;font-weight:600;color:var(--amber);margin-bottom:.75rem}
+.vinfo{background:var(--s1);border:.5px solid var(--b1);border-radius:var(--rs);padding:8px 12px;font-size:11px;color:var(--tx2);margin-bottom:.75rem;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.vinfo strong{color:var(--gold)}
+.loading{text-align:center;padding:3rem 1rem;color:var(--tx2)}
+.spinbig{display:inline-block;width:18px;height:18px;border:2px solid var(--s3);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:7px}
+.empty{text-align:center;padding:2.5rem 1rem;color:var(--tx2)}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:500px){
+  .choices{grid-template-columns:1fr}
+  .qword{font-size:22px}
+  .tab{font-size:11px;padding:7px 4px}
+}
+</style>
+
+<div class="app">
+  <div class="hdr">
+    <div class="hdr-title">Luyện Từ Vựng <span>VSTEP</span></div>
+    <div class="hdr-sub">Ôn luyện từ vựng tiếng Anh chuẩn VSTEP B1–C1</div>
+    <div class="pills">
+      <span class="hpill" id="vocab-count-pill">2,332 từ vựng</span>
+      <span class="hpill">Trắc nghiệm</span>
+      <span class="hpill">Flashcard</span>
+      <span class="hpill">Ôn sai</span>
+      <span class="hpill">AI giải thích C1</span>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab on" id="tab-quiz" onclick="sw('quiz')">🎯 Trắc nghiệm</button>
+    <button class="tab" id="tab-flash" onclick="sw('flash')">🃏 Flashcard</button>
+    <button class="tab" id="tab-review" onclick="sw('review')">🔁 Ôn sai</button>
+  </div>
+
+  <div id="panel-quiz" class="panel on">
+    <div id="qmain"></div>
+  </div>
+  <div id="panel-flash" class="panel"><div id="fmain"></div></div>
+  <div id="panel-review" class="panel"><div id="rmain"></div></div>
+</div>
+
+<script>
+// ── VOCAB DATA (embedded from xlsx) ──
+const RAW_VOCAB = [{"e":"Play cards","v":"Chơi bài","p":"noun"},{"e":"computer games","v":"trò chơi máy tính","p":"noun"},{"e":"play chess","v":"chơi cờ vua","p":"word"},{"e":"musical instruments","v":"nhạc cụ","p":"noun"},{"e":"sports","v":"thể thao","p":"noun"},{"e":"traditional games","v":"trò chơi truyền thống","p":"noun"},{"e":"coins","v":"tiền xu","p":"noun"},{"e":"stamps","v":"tem","p":"noun"},{"e":"antiques","v":"đồ cổ","p":"noun"},{"e":"books","v":"sách","p":"noun"},{"e":"listening to music","v":"nghe nhạc","p":"noun"},{"e":"reading","v":"đọc sách","p":"verb"},{"e":"sleeping","v":"ngủ","p":"verb"},{"e":"baking","v":"nướng bánh","p":"verb"},{"e":"watching movies","v":"xem phim","p":"noun"},{"e":"cooking","v":"nấu ăn","p":"verb"},{"e":"handicraft making","v":"làm đồ thủ công","p":"verb"},{"e":"collecting","v":"sưu tập","p":"verb"},{"e":"dancing","v":"nhảy múa","p":"verb"},{"e":"surfing the Internet","v":"lướt Internet","p":"noun"},{"e":"gardening","v":"làm vườn","p":"verb"},{"e":"jogging","v":"chạy bộ","p":"verb"},{"e":"going to karaoke bar","v":"đi đến quán karaoke","p":"noun"},{"e":"travelling","v":"du lịch","p":"verb"},{"e":"camping","v":"cắm trại","p":"verb"},{"e":"hiking","v":"đi bộ đường dài","p":"verb"},{"e":"hanging out with friends","v":"đi chơi với bạn bè","p":"noun"},{"e":"tennis","v":"quần vợt","p":"noun"},{"e":"basketball","v":"bóng rổ","p":"noun"},{"e":"baseball","v":"bóng chày","p":"noun"},{"e":"yoga","v":"yoga","p":"noun"},{"e":"swimming","v":"bơi lội","p":"verb"},{"e":"aerobics","v":"thể dục nhịp điệu","p":"noun"},{"e":"martial arts","v":"võ thuật","p":"noun"},{"e":"running","v":"chạy bộ","p":"verb"},{"e":"volleyball","v":"bóng chuyền","p":"noun"},{"e":"judo","v":"judo","p":"noun"},{"e":"skiing","v":"trượt tuyết","p":"verb"},{"e":"badminton","v":"cầu lông","p":"noun"},{"e":"golf","v":"golf","p":"noun"},{"e":"table tennis","v":"bóng bàn","p":"noun"},{"e":"karate","v":"karate","p":"noun"},{"e":"meditation","v":"thiền định","p":"noun"},{"e":"mountain climbing","v":"leo núi","p":"verb"},{"e":"sailing","v":"đi thuyền","p":"verb"},{"e":"cycling","v":"đạp xe","p":"verb"},{"e":"uncle","v":"chú / cậu","p":"noun"},{"e":"cousin","v":"anh em họ","p":"noun"},{"e":"nephew","v":"cháu trai","p":"noun"},{"e":"aunt","v":"dì / cô","p":"noun"},{"e":"niece","v":"cháu gái","p":"noun"},{"e":"single","v":"độc thân","p":"adj"},{"e":"separated","v":"ly thân","p":"adj"},{"e":"divorced","v":"ly hôn","p":"adj"},{"e":"remarried","v":"tái hôn","p":"adj"},{"e":"cathedral","v":"nhà thờ lớn","p":"noun"},{"e":"pagoda","v":"chùa","p":"noun"},{"e":"souvenir shops","v":"cửa hàng lưu niệm","p":"noun"},{"e":"temple","v":"ngôi đền","p":"noun"},{"e":"fountain","v":"đài phun nước","p":"noun"},{"e":"statue","v":"bức tượng","p":"noun"},{"e":"historical monument","v":"di tích lịch sử","p":"noun"},{"e":"art galleries","v":"phòng trưng bày nghệ thuật","p":"noun"},{"e":"national park","v":"công viên quốc gia","p":"noun"},{"e":"voyage","v":"chuyến hành trình","p":"noun"},{"e":"sunbathe","v":"tắm nắng","p":"verb"},{"e":"get lost","v":"lạc đường","p":"verb"},{"e":"go sailing","v":"đi thuyền buồm","p":"verb"},{"e":"go surfing","v":"đi lướt sóng","p":"verb"},{"e":"have a picnic","v":"đi dã ngoại","p":"phrase"},{"e":"fish","v":"cá","p":"noun"},{"e":"pork","v":"thịt lợn","p":"noun"},{"e":"beef","v":"thịt bò","p":"noun"},{"e":"chicken","v":"thịt gà","p":"noun"},{"e":"duck","v":"vịt","p":"noun"},{"e":"shrimp","v":"con tôm","p":"noun"},{"e":"crab","v":"cua","p":"noun"},{"e":"seafood","v":"hải sản","p":"noun"},{"e":"Korean-style clothes","v":"quần áo kiểu Hàn Quốc","p":"noun"},{"e":"hat","v":"mũ","p":"noun"},{"e":"cap","v":"mũ lưỡi trai","p":"noun"},{"e":"scarf","v":"khăn quàng cổ","p":"noun"},{"e":"shirt","v":"áo sơ mi","p":"noun"},{"e":"T-shirt","v":"áo phông","p":"noun"},{"e":"dress","v":"váy đầm","p":"noun"},{"e":"skirt","v":"váy","p":"noun"},{"e":"jeans","v":"quần jean","p":"noun"},{"e":"coat","v":"áo khoác dài","p":"noun"},{"e":"jacket","v":"áo khoác","p":"noun"},{"e":"suit","v":"bộ veston","p":"noun"},{"e":"sweater","v":"áo len","p":"noun"},{"e":"tie","v":"cà vạt","p":"noun"},{"e":"socks","v":"tất/vớ","p":"noun"},{"e":"boots","v":"ủng/bốt","p":"noun"},{"e":"shoes","v":"giày","p":"noun"},{"e":"sandals","v":"dép","p":"noun"},{"e":"bracelet","v":"vòng tay","p":"noun"},{"e":"necklace","v":"vòng cổ","p":"noun"},{"e":"earrings","v":"bông tai","p":"noun"},{"e":"belt","v":"thắt lưng","p":"noun"},{"e":"reduce","v":"giảm bớt","p":"verb"},{"e":"waste","v":"rác thải / lãng phí","p":"noun"},{"e":"energy","v":"năng lượng","p":"noun"},{"e":"resource","v":"nguồn tài nguyên","p":"noun"},{"e":"forest","v":"rừng","p":"noun"},{"e":"wildlife","v":"động vật hoang dã","p":"noun"},{"e":"protect","v":"bảo vệ","p":"verb"},{"e":"damage","v":"gây hại / phá hoại","p":"verb"},{"e":"harmful","v":"có hại","p":"adj"},{"e":"impact","v":"tác động","p":"noun"},{"e":"prevent","v":"ngăn chặn","p":"verb"},{"e":"avoid","v":"tránh","p":"verb"},{"e":"technology","v":"công nghệ","p":"noun"},{"e":"internet","v":"internet","p":"noun"},{"e":"device","v":"thiết bị","p":"noun"},{"e":"software","v":"phần mềm","p":"noun"},{"e":"hardware","v":"phần cứng","p":"noun"},{"e":"application","v":"ứng dụng","p":"noun"},{"e":"online","v":"trực tuyến","p":"adj"},{"e":"network","v":"mạng lưới","p":"noun"},{"e":"data","v":"dữ liệu","p":"noun"},{"e":"digital","v":"kỹ thuật số","p":"adj"},{"e":"modern","v":"hiện đại","p":"adj"},{"e":"invention","v":"phát minh","p":"noun"},{"e":"innovation","v":"sự đổi mới","p":"noun"},{"e":"benefit","v":"lợi ích","p":"noun"},{"e":"risk","v":"rủi ro","p":"noun"},{"e":"influence","v":"ảnh hưởng","p":"verb"},{"e":"affect","v":"tác động đến","p":"verb"},{"e":"disease","v":"bệnh tật","p":"noun"},{"e":"illness","v":"ốm đau","p":"noun"},{"e":"treatment","v":"điều trị","p":"noun"},{"e":"exercise","v":"luyện tập","p":"noun"},{"e":"diet","v":"chế độ ăn","p":"noun"},{"e":"habit","v":"thói quen","p":"noun"},{"e":"lifestyle","v":"lối sống","p":"noun"},{"e":"stress","v":"căng thẳng","p":"noun"},{"e":"mental","v":"tâm lý / tinh thần","p":"adj"},{"e":"physical","v":"thể chất","p":"adj"},{"e":"hospital","v":"bệnh viện","p":"noun"},{"e":"doctor","v":"bác sĩ","p":"noun"},{"e":"nurse","v":"y tá","p":"noun"},{"e":"medicine","v":"thuốc / y học","p":"noun"},{"e":"recover","v":"hồi phục","p":"verb"},{"e":"career","v":"sự nghiệp","p":"noun"},{"e":"employee","v":"nhân viên","p":"noun"},{"e":"employer","v":"người thuê lao động","p":"noun"},{"e":"salary","v":"mức lương","p":"noun"},{"e":"responsibility","v":"trách nhiệm","p":"noun"},{"e":"education","v":"giáo dục","p":"noun"},{"e":"curriculum","v":"chương trình học","p":"noun"},{"e":"examination","v":"kỳ thi","p":"noun"},{"e":"scholarship","v":"học bổng","p":"noun"},{"e":"tuition","v":"học phí","p":"noun"},{"e":"research","v":"nghiên cứu","p":"noun"},{"e":"academic","v":"học thuật","p":"adj"},{"e":"compulsory","v":"bắt buộc","p":"adj"},{"e":"optional","v":"tự chọn","p":"adj"},{"e":"evaluation","v":"đánh giá","p":"noun"},{"e":"assessment","v":"kiểm tra / đánh giá","p":"noun"},{"e":"method","v":"phương pháp","p":"noun"},{"e":"knowledge","v":"kiến thức","p":"noun"},{"e":"skill","v":"kỹ năng","p":"noun"},{"e":"achievement","v":"thành tích","p":"noun"},{"e":"motivation","v":"động lực","p":"noun"},{"e":"society","v":"xã hội","p":"noun"},{"e":"community","v":"cộng đồng","p":"noun"},{"e":"culture","v":"văn hóa","p":"noun"},{"e":"tradition","v":"truyền thống","p":"noun"},{"e":"population","v":"dân số","p":"noun"},{"e":"government","v":"chính phủ","p":"noun"},{"e":"policy","v":"chính sách","p":"noun"},{"e":"economy","v":"kinh tế","p":"noun"},{"e":"industry","v":"ngành công nghiệp","p":"noun"},{"e":"business","v":"kinh doanh","p":"noun"},{"e":"market","v":"thị trường","p":"noun"},{"e":"profit","v":"lợi nhuận","p":"noun"},{"e":"invest","v":"đầu tư","p":"verb"},{"e":"proportion","v":"tỷ lệ","p":"noun"},{"e":"trend","v":"xu hướng","p":"noun"},{"e":"fluctuation","v":"sự dao động","p":"noun"},{"e":"fluctuate","v":"dao động","p":"verb"},{"e":"peak","v":"đỉnh / đạt đỉnh","p":"noun/verb"},{"e":"bottom","v":"đáy","p":"noun"},{"e":"rebound","v":"phục hồi","p":"noun/verb"},{"e":"stability","v":"sự ổn định","p":"noun"},{"e":"volatility","v":"sự biến động","p":"noun"},{"e":"surge","v":"tăng mạnh","p":"noun/verb"},{"e":"drop","v":"giảm mạnh","p":"noun/verb"},{"e":"trajectory","v":"xu hướng / quỹ đạo","p":"noun"},{"e":"dramatically","v":"đáng kể / mạnh mẽ","p":"adv"},{"e":"sharply","v":"đột ngột / nhanh","p":"adv"},{"e":"rapidly","v":"nhanh chóng","p":"adv"},{"e":"gradually","v":"dần dần","p":"adv"},{"e":"steadily","v":"đều đặn","p":"adv"},{"e":"moderately","v":"vừa phải","p":"adv"},{"e":"relatively","v":"tương đối","p":"adv"},{"e":"disparity","v":"sự chênh lệch","p":"noun"},{"e":"legislation","v":"luật pháp","p":"noun"},{"e":"alleviate","v":"giảm nhẹ","p":"verb"},{"e":"exacerbate","v":"làm trầm trọng thêm","p":"verb"},{"e":"aggravate","v":"làm nặng thêm","p":"verb"},{"e":"consume","v":"tiêu thụ","p":"verb"},{"e":"emit","v":"phát ra","p":"verb"},{"e":"refuge","v":"nơi trú ẩn","p":"noun"},{"e":"lessen","v":"giảm bớt","p":"verb"},{"e":"relentless","v":"không ngừng nghỉ","p":"adj"},{"e":"savvy","v":"am hiểu / thông thạo","p":"adj"},{"e":"intensify","v":"tăng cường","p":"verb"},{"e":"annihilate","v":"tiêu diệt hoàn toàn","p":"verb"},{"e":"intake","v":"lượng tiêu thụ","p":"noun"},{"e":"implications","v":"hàm ý / hệ quả","p":"noun"},{"e":"resurgence","v":"sự hồi sinh","p":"noun"},{"e":"obliterate","v":"xóa sạch","p":"verb"},{"e":"credible","v":"đáng tin cậy","p":"adj"},{"e":"precise","v":"chính xác","p":"adj"},{"e":"ambiguous","v":"mơ hồ","p":"adj"},{"e":"sophisticated","v":"tinh tế / phức tạp","p":"adj"},{"e":"consensus","v":"sự đồng thuận","p":"noun"},{"e":"governance","v":"quản trị","p":"noun"},{"e":"mechanism","v":"cơ chế","p":"noun"},{"e":"deforestation","v":"nạn phá rừng","p":"noun"},{"e":"extinction","v":"sự tuyệt chủng","p":"noun"},{"e":"ecosystem","v":"hệ sinh thái","p":"noun"},{"e":"conservation","v":"bảo tồn","p":"noun"},{"e":"renewable","v":"tái tạo","p":"adj"},{"e":"contaminate","v":"làm ô nhiễm","p":"verb"},{"e":"undertake","v":"thực hiện / đảm nhận","p":"verb"},{"e":"thrive","v":"phát triển mạnh","p":"verb"},{"e":"prosperity","v":"sự thịnh vượng","p":"noun"},{"e":"accomplish","v":"hoàn thành / đạt được","p":"verb"},{"e":"cope with","v":"đối phó với","p":"verb"},{"e":"embark on","v":"bắt đầu / khởi sự","p":"phrase"},{"e":"showcase","v":"trưng bày / thể hiện","p":"verb"},{"e":"lingering","v":"dai dẳng","p":"adj"},{"e":"otherworldly","v":"huyền ảo / siêu thực","p":"adj"},{"e":"play a vital role","v":"đóng vai trò quan trọng","p":"phrase"},{"e":"contribute to","v":"góp phần vào","p":"phrase"},{"e":"have a positive impact on","v":"có tác động tích cực đến","p":"phrase"},{"e":"lead a balanced life","v":"sống cân bằng","p":"phrase"},{"e":"make ends meet","v":"kiếm đủ sống","p":"phrase"},{"e":"overcome obstacles","v":"vượt qua trở ngại","p":"phrase"},{"e":"broaden horizons","v":"mở rộng tầm nhìn","p":"phrase"},{"e":"step out of comfort zone","v":"bước ra khỏi vùng an toàn","p":"phrase"},{"e":"raise awareness","v":"nâng cao nhận thức","p":"phrase"},{"e":"gain experience","v":"tích lũy kinh nghiệm","p":"phrase"},{"e":"stand out","v":"nổi bật","p":"phrase"},{"e":"make a difference","v":"tạo nên sự khác biệt","p":"phrase"},{"e":"build good habits","v":"xây dựng thói quen tốt","p":"phrase"},{"e":"achieve goals","v":"đạt được mục tiêu","p":"phrase"},{"e":"in my opinion","v":"theo ý kiến tôi","p":"phrase"},{"e":"firstly","v":"thứ nhất","p":"adv"},{"e":"secondly","v":"thứ hai","p":"adv"},{"e":"thirdly","v":"thứ ba","p":"adv"},{"e":"finally","v":"cuối cùng","p":"adv"},{"e":"to begin with","v":"trước hết","p":"phrase"},{"e":"furthermore","v":"hơn nữa","p":"adv"},{"e":"moreover","v":"hơn thế nữa","p":"adv"},{"e":"however","v":"tuy nhiên","p":"adv"},{"e":"nevertheless","v":"tuy nhiên","p":"adv"},{"e":"in contrast","v":"trái lại","p":"phrase"},{"e":"on the other hand","v":"mặt khác","p":"phrase"},{"e":"as a result","v":"kết quả là","p":"phrase"},{"e":"therefore","v":"vì vậy","p":"adv"},{"e":"consequently","v":"do đó","p":"adv"},{"e":"in conclusion","v":"tóm lại","p":"phrase"},{"e":"to sum up","v":"tóm lại","p":"phrase"},{"e":"in addition","v":"ngoài ra","p":"phrase"},{"e":"witness a rise","v":"chứng kiến sự tăng trưởng","p":"phrase"},{"e":"undergo a fall","v":"trải qua sự sụt giảm","p":"phrase"},{"e":"stabilize","v":"ổn định","p":"verb"},{"e":"witnessed a dramatic surge","v":"chứng kiến sự tăng vọt","p":"phrase"},{"e":"maintained its dominant position","v":"giữ vị trí dẫn đầu","p":"phrase"},{"e":"a subsequent rise","v":"sự tăng trưởng tiếp theo","p":"phrase"},{"e":"to be more specific","v":"cụ thể hơn","p":"phrase"},{"e":"respectively","v":"lần lượt","p":"adv"},{"e":"fluctuate between A and B","v":"dao động giữa A và B","p":"phrase"},{"e":"remain stable at","v":"duy trì ổn định ở mức","p":"phrase"},{"e":"It would be fair to say that…","v":"Có thể nói rằng…","p":"cấu trúc"},{"e":"I have mixed feelings about…","v":"Tôi có cảm xúc lẫn lộn về…","p":"cấu trúc"},{"e":"This could be attributed to…","v":"Điều này có thể do…","p":"cấu trúc"},{"e":"I am deeply concerned about…","v":"Tôi vô cùng lo ngại về…","p":"cấu trúc"},{"e":"I place a high value on…","v":"Tôi rất coi trọng…","p":"cấu trúc"},{"e":"I would argue that…","v":"Tôi cho rằng…","p":"cấu trúc"},{"e":"It plays a vital role in…","v":"Nó đóng vai trò quan trọng trong…","p":"cấu trúc"},{"e":"I am convinced that…","v":"Tôi tin chắc rằng…","p":"cấu trúc"},{"e":"I find it quite challenging to…","v":"Tôi thấy việc này khá khó khăn…","p":"cấu trúc"},{"e":"balance","v":"cân bằng","p":"noun"},{"e":"lifestyle choice","v":"lựa chọn lối sống","p":"noun"},{"e":"quality of life","v":"chất lượng cuộc sống","p":"noun"},{"e":"work-life balance","v":"cân bằng công việc - cuộc sống","p":"noun"},{"e":"self-discipline","v":"tính kỷ luật tự giác","p":"noun"},{"e":"critical thinking","v":"tư duy phản biện","p":"noun"},{"e":"leadership","v":"khả năng lãnh đạo","p":"noun"},{"e":"cooperation","v":"sự hợp tác","p":"noun"},{"e":"confidence","v":"sự tự tin","p":"noun"},{"e":"behaviour","v":"hành vi","p":"noun"},{"e":"attitude","v":"thái độ","p":"noun"},{"e":"optimistic","v":"lạc quan","p":"adj"},{"e":"pessimistic","v":"bi quan","p":"adj"},{"e":"responsible","v":"có trách nhiệm","p":"adj"},{"e":"reliable","v":"đáng tin cậy","p":"adj"},{"e":"heritage","v":"di sản","p":"noun"},{"e":"ancestor","v":"tổ tiên","p":"noun"},{"e":"immigrant","v":"người nhập cư","p":"noun"},{"e":"urbanisation","v":"đô thị hóa","p":"noun"},{"e":"migration","v":"di cư","p":"noun"},{"e":"life expectancy","v":"tuổi thọ","p":"noun"},{"e":"inflation","v":"lạm phát","p":"noun"},{"e":"entrepreneur","v":"doanh nhân","p":"noun"},{"e":"inequality","v":"bất bình đẳng","p":"noun"},{"e":"poverty","v":"đói nghèo","p":"noun"},{"e":"hardship","v":"khó khăn / gian khổ","p":"noun"},{"e":"reform","v":"cải cách","p":"noun/verb"},{"e":"prestigious","v":"danh giá / uy tín","p":"adj"},{"e":"accomplish","v":"hoàn thành","p":"verb"},{"e":"fascinating","v":"hấp dẫn / lôi cuốn","p":"adj"},{"e":"intimidating","v":"đáng sợ / gây áp lực","p":"adj"},{"e":"ingredient","v":"nguyên liệu","p":"noun"},{"e":"delight","v":"niềm vui / làm vui","p":"noun/verb"},{"e":"mortality","v":"tỷ lệ tử vong","p":"noun"},{"e":"illiteracy","v":"nạn mù chữ","p":"noun"},{"e":"dissemination","v":"sự phổ biến / lan truyền","p":"noun"},{"e":"literacy","v":"trình độ đọc viết","p":"noun"},{"e":"outweigh","v":"vượt trội hơn","p":"verb"},{"e":"coincidence","v":"sự trùng hợp","p":"noun"},{"e":"accuracy","v":"sự chính xác","p":"noun"},{"e":"validity","v":"tính hợp lệ","p":"noun"},{"e":"envision","v":"hình dung / dự tính","p":"verb"},{"e":"determine","v":"quyết tâm / xác định","p":"verb"}];
+
+// Filter: only vocab with clear English-Vietnamese pairs, skip pure headers
+const VOCAB = RAW_VOCAB.filter(w => w.e && w.v && w.e.length > 1 && w.v.length > 1 && !w.e.match(/^(Things|Indoor|Outdoor|Color|Types|Ways|Kinds|Describing|TELEVISION|Vegetables|Fruit|Drinks)/i));
+
+const KEYS = ['a','b','c','d'];
+let cache = {};
+let qWords=[], qIdx=0, score=0, streak=0, best=0, ans=[], missed=[];
+let fcW=[], fcI=0, fcF=false, fcKn=new Set(), fcUn=new Set();
+let revW=[], revI=0, revS=0, revA=[];
+let curTab = 'quiz';
+
+document.getElementById('vocab-count-pill').textContent = VOCAB.length.toLocaleString() + ' từ vựng';
+
+function sh(a){return a.slice().sort(()=>Math.random()-.5)}
+function sw(t){
+  curTab=t;
+  ['quiz','flash','review'].forEach(x=>{
+    document.getElementById('tab-'+x).classList.toggle('on',x===t);
+    document.getElementById('panel-'+x).classList.toggle('on',x===t);
+  });
+  if(t==='flash'&&!fcW.length) initFlash();
+  if(t==='review') initReview();
+}
+
+// ── AI ENRICH (live, via Anthropic API) ──
+async function fetchEnrich(word, pos){
+  if(cache[word]&&cache[word].synonyms) return;
+  const prompt = `You are an expert English vocabulary teacher for Vietnamese VSTEP exam students (B2-C1 level).
+
+For the word/phrase: "${word}" (${pos})
+Vietnamese meaning: "${VOCAB.find(v=>v.e===word)?.v||''}"
+
+Return a JSON object with exactly these fields (no extra text, no markdown):
+{
+  "synonyms": ["synonym1", "synonym2", "synonym3"],
+  "paraphrases": ["paraphrase/near-equivalent phrase 1", "paraphrase 2"],
+  "collocation": "one natural C1-level collocation using this word",
+  "clause": "one complete C1-level example sentence (complex syntax, academic register, IELTS Band 7-8)",
+  "tip": "One practical tip in Vietnamese for how to use this word correctly at C1 level vs common mistakes Vietnamese learners make"
+}`;
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({model:"claude-sonnet-4-20250514", max_tokens:600, messages:[{role:"user",content:prompt}]})
+    });
+    const d = await res.json();
+    if(!d.content||d.error) throw new Error('API error');
+    let txt = d.content.map(c=>c.text||'').join('').replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(txt);
+    cache[word] = parsed;
+  } catch(e){
+    cache[word] = {synonyms:['—'],paraphrases:['—'],collocation:'—',clause:'—',tip:''};
+  }
+}
+
+function explHTML(w, isOk, label){
+  const en = cache[w.e]||{};
+  const hasSyn = en.synonyms && en.synonyms[0] !== '—';
+  return `<div class="ares-hdr ${isOk?'ok':'ng'}">
+    ${isOk?'✓ Đúng rồi!':'✗ Chưa đúng!'} <span style="font-weight:400;font-size:12px">+${isOk?10:0} điểm</span>
+    ${isOk?'':` <span style="font-size:12px;font-weight:400;color:var(--red)">→ Đáp án: <strong>${w.v}</strong></span>`}
+  </div>
+  <div class="ares-body">
+    <div class="info-block">
+      <span class="info-lbl lbl-an">Nghĩa đúng</span>
+      <span class="an-val">${w.v}</span>
+    </div>
+    <div class="info-block">
+      <span class="info-lbl lbl-sy" style="display:flex;align-items:center;gap:8px">
+        Từ đồng nghĩa & Paraphrase
+        <span style="font-size:9px;background:var(--blue-bg);color:var(--blue);padding:1px 6px;border-radius:20px;border:.5px solid var(--blue-bd)">🤖 AI</span>
+      </span>
+      ${!hasSyn ? '<div class="loading-inline"><span class="sp"></span>Đang phân tích...</div>' : `
+      <div style="margin-bottom:6px">
+        <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;font-weight:700">TỪ ĐỒNG NGHĨA</div>
+        <div class="pill-row">${(en.synonyms||[]).map(s=>`<span class="syn-pill">${s}</span>`).join('')}</div>
+      </div>
+      ${en.paraphrases&&en.paraphrases.length?`<div>
+        <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;font-weight:700">PARAPHRASE / CỤM THAY THẾ</div>
+        <div class="pill-row">${en.paraphrases.map(p=>`<span class="col-pill">${p}</span>`).join('')}</div>
+      </div>`:''}
+      `}
+    </div>
+    ${hasSyn&&en.clause?`<div class="info-block">
+      <span class="info-lbl lbl-cl">Câu ví dụ C1</span>
+      <div class="clause-box">"${en.clause}"</div>
+    </div>`:''}
+    ${hasSyn&&en.tip?`<div class="tip-box">💡 ${en.tip}</div>`:''}
+  </div>`;
+}
+
+// ── QUIZ ──
+function initQuiz(){
+  qWords=sh(VOCAB).slice(0,30);
+  qIdx=0;score=0;streak=0;best=0;ans=new Array(30).fill(null);missed=[];
+  renderQ();
+}
+
+function mkChoices(w){
+  return sh([w.v,...sh(VOCAB.filter(v=>v.v!==w.v)).slice(0,3).map(v=>v.v)]);
+}
+
+function renderQ(){
+  const el = document.getElementById('qmain');
+  if(qIdx>=30){renderResult(el);return}
+  const w = qWords[qIdx]; const ch = mkChoices(w); const pct = Math.round(qIdx/30*100);
+  window._ch=ch; window._w=w;
+  el.innerHTML=`
+<div class="vinfo"><span>📖</span><strong>${VOCAB.length.toLocaleString()} từ</strong><span>— lấy ngẫu nhiên từ toàn bộ danh sách VSTEP</span></div>
+<div class="sbar">
+  <div class="sc"><span class="l">Câu</span>${qIdx+1}/30</div>
+  <div class="sc"><span class="l">Điểm</span>${score}</div>
+  <div class="sc g">Đúng: ${ans.filter(a=>a===true).length}</div>
+  <div class="sc r">Sai: ${ans.filter(a=>a===false).length}</div>
+  ${streak>=3?`<div class="sc gold">🔥 ${streak} liên tiếp</div>`:''}
+</div>
+<div class="prog">
+  <div class="prow"><span>${pct}% hoàn thành</span><span>${30-qIdx} câu còn lại</span></div>
+  <div class="ptrack"><div class="pfill" style="width:${pct}%"></div></div>
+</div>
+<div class="qcard">
+  <div class="qbadge">Nghĩa tiếng Việt là gì?</div>
+  <div class="qword">${w.e}</div>
+  <div class="qpos">(${w.p})</div>
+  <div class="choices" id="choices">
+    ${ch.map((c,i)=>`<button class="ch" id="ch${i}" onclick="pick(${i})"><span class="ck">${KEYS[i].toUpperCase()}</span>${c}</button>`).join('')}
+  </div>
+  <div class="ares" id="ares"></div>
+</div>
+<div class="nav">
+  <button class="btn gh" onclick="skipQ()">Bỏ qua →</button>
+  <button class="btn" onclick="prevQ()" ${qIdx===0?'disabled':''} style="margin-left:auto">← Trước</button>
+  <button class="btn pr" id="nb" style="display:none" onclick="nextQ()">Tiếp theo →</button>
+</div>
+<div class="kbhint">Nhấn phím A B C D để trả lời nhanh</div>`;
+}
+
+async function pick(idx){
+  if(ans[qIdx]!==null)return;
+  const ch=window._ch,w=window._w;
+  const ok=ch[idx]===w.v;
+  ans[qIdx]=ok;
+  if(ok){score+=10;streak++;if(streak>best)best=streak;}else{streak=0;missed.push(w);}
+  [0,1,2,3].forEach(i=>{
+    const b=document.getElementById('ch'+i);if(!b)return;
+    b.classList.add('dis');
+    if(ch[i]===w.v)b.classList.add('ok');
+    else if(i===idx&&!ok)b.classList.add('ng');
+  });
+  const ares=document.getElementById('ares');
+  // Show immediately with loading state
+  ares.innerHTML=`<div class="ares-hdr ${ok?'ok':'ng'}">
+    ${ok?'✓ Đúng rồi!':'✗ Chưa đúng!'} <span style="font-weight:400;font-size:12px">+${ok?10:0} điểm</span>
+    ${ok?'':` <span style="font-size:12px;font-weight:400">→ <strong>${w.v}</strong></span>`}
+  </div>
+  <div class="ares-body">
+    <div class="info-block">
+      <span class="info-lbl lbl-an">Nghĩa đúng</span>
+      <span class="an-val">${w.v}</span>
+    </div>
+    <div class="info-block">
+      <span class="info-lbl lbl-sy" style="display:flex;align-items:center;gap:8px">
+        Từ đồng nghĩa & Paraphrase
+        <span style="font-size:9px;background:var(--blue-bg);color:var(--blue);padding:1px 6px;border-radius:20px;border:.5px solid var(--blue-bd)">🤖 AI</span>
+      </span>
+      <div class="loading-inline"><span class="sp"></span>Đang phân tích từ này...</div>
+    </div>
+  </div>`;
+  ares.classList.add('show');
+  document.getElementById('nb').style.display='inline-block';
+  // Fetch AI enrich
+  await fetchEnrich(w.e, w.p);
+  ares.innerHTML = explHTML(w, ok, '');
+  ares.classList.add('show');
+}
+
+function nextQ(){if(qIdx<29){qIdx++;renderQ();}}
+function prevQ(){if(qIdx>0){qIdx--;renderQ();}}
+function skipQ(){ans[qIdx]=false;streak=0;missed.push(qWords[qIdx]);if(qIdx<29){qIdx++;renderQ();}}
+document.addEventListener('keydown',e=>{
+  if(curTab!=='quiz')return;
+  const i=KEYS.indexOf(e.key.toLowerCase());
+  if(i>=0&&ans[qIdx]===null)pick(i);
+});
+
+function renderResult(el){
+  const pct=Math.round(score/300*100);
+  const col=pct>=70?'var(--green)':pct>=50?'var(--amber)':'var(--red)';
+  const msg=pct>=90?'Xuất sắc! Bạn nắm rất vững từ vựng VSTEP!':pct>=70?'Tốt lắm! Hãy ôn lại từ còn sai.':pct>=50?'Cố gắng thêm! Hãy luyện flashcard.':'Hãy ôn tập thêm!';
+  const uniq=[...new Map(missed.map(w=>[w.e,w])).values()];
+  el.innerHTML=`<div class="result">
+    <div class="rscore" style="color:${col}">${score}<span style="font-size:24px;color:var(--tx2)">/300</span></div>
+    <div class="rmsg">${msg}</div>
+    <div class="rgrid">
+      <div class="rc"><div class="rn" style="color:var(--green)">${ans.filter(a=>a===true).length}</div><div class="rl">Câu đúng</div></div>
+      <div class="rc"><div class="rn" style="color:var(--red)">${ans.filter(a=>a===false).length}</div><div class="rl">Câu sai</div></div>
+      <div class="rc"><div class="rn" style="color:var(--amber)">${best}</div><div class="rl">Streak cao nhất</div></div>
+    </div>
+    ${uniq.length?`<div class="mlist"><div class="mt">Từ cần ôn (${uniq.length})</div>${uniq.slice(0,10).map(w=>`<div class="mi"><span>${w.e}</span><span class="mv">${w.v}</span></div>`).join('')}</div>`:''}
+    <div class="rbtns">
+      <button class="btn pr" onclick="initQuiz()">Làm bộ mới</button>
+      ${uniq.length?`<button class="btn" onclick="sw('review')">Ôn từ sai →</button>`:''}
+      <button class="btn" onclick="sw('flash')">Flashcard →</button>
+    </div>
+  </div>`;
+}
+
+// ── FLASHCARD ──
+function initFlash(){fcW=sh(VOCAB);fcI=0;fcF=false;fcKn=new Set();fcUn=new Set();renderFlash();}
+function renderFlash(){
+  const el=document.getElementById('fmain');
+  const w=fcW[fcI];const tot=fcW.length;
+  const pct=Math.round((fcKn.size+fcUn.size)/tot*100);
+  const showD=Math.min(tot,100);
+  const dots=fcW.slice(0,showD).map((_,i)=>`<div class="dot ${fcKn.has(i)?'kn':fcUn.has(i)?'un':''} ${i===fcI?'cu':''}" onclick="fcG(${i})"></div>`).join('');
+  el.innerHTML=`
+<div class="vinfo"><span>📖</span><strong>${tot.toLocaleString()} từ</strong><span>trong toàn bộ danh sách VSTEP</span></div>
+<div class="fcmeta">
+  <div class="fccnt">Thẻ ${fcI+1} / ${tot}</div>
+  <div class="fcacts">
+    <button class="btn" style="font-size:11px;padding:5px 9px" onclick="fcSh()">Xáo thẻ</button>
+    <button class="btn" style="font-size:11px;padding:5px 9px" onclick="fcRe()">Làm lại</button>
+  </div>
+</div>
+<div class="ptrack" style="margin-bottom:.6rem"><div class="pfill" style="width:${pct}%"></div></div>
+<div class="fscene" onclick="fcFl()">
+  <div class="fccard ${fcF?'fl':''}">
+    <div class="fcface">
+      <div class="fchint">Tiếng Anh — nhấn để lật</div>
+      <div class="fcw">${w.e}</div>
+      <div class="fcp">(${w.p})</div>
+      <div class="fctap">↕ nhấn để xem nghĩa</div>
+    </div>
+    <div class="fcface fcback">
+      <div class="fchint">Tiếng Việt</div>
+      <div class="fcviet">${w.v}</div>
+      <div class="fcesub">${w.e}</div>
+    </div>
+  </div>
+</div>
+<div class="fcbtns">
+  <button class="bunk" onclick="fcM('u')">✗ Chưa biết</button>
+  <button class="btn" style="font-size:12px;padding:8px 14px" onclick="fcFl()">↕ Lật thẻ</button>
+  <button class="bkn" onclick="fcM('k')">✓ Đã biết</button>
+</div>
+<div style="display:flex;gap:7px;justify-content:center;margin-bottom:.6rem">
+  <button class="btn" onclick="fcPr()" ${fcI===0?'disabled':''} style="padding:7px 16px;font-size:12px">←</button>
+  <button class="btn" onclick="fcNx()" ${fcI===tot-1?'disabled':''} style="padding:7px 16px;font-size:12px">→</button>
+</div>
+<div class="dots">${dots}${tot>showD?`<span style="font-size:10px;color:var(--tx3);align-self:center">+${tot-showD}</span>`:''}</div>
+<div class="fcleg">
+  <span><span class="ld" style="background:var(--green)"></span>Đã biết: ${fcKn.size}</span>
+  <span><span class="ld" style="background:var(--red)"></span>Chưa biết: ${fcUn.size}</span>
+  <span><span class="ld" style="background:var(--s3);border:.5px solid var(--b2)"></span>Chưa xem: ${tot-fcKn.size-fcUn.size}</span>
+</div>
+${fcUn.size>0?`<div style="text-align:center;margin-top:.6rem"><button class="btn pr" onclick="fcSU()">Ôn ${fcUn.size} thẻ chưa biết →</button></div>`:''}`;
+}
+function fcFl(){fcF=!fcF;renderFlash()}
+function fcNx(){if(fcI<fcW.length-1){fcI++;fcF=false;renderFlash()}}
+function fcPr(){if(fcI>0){fcI--;fcF=false;renderFlash()}}
+function fcG(i){fcI=i;fcF=false;renderFlash()}
+function fcM(t){if(t==='k'){fcKn.add(fcI);fcUn.delete(fcI);}else{fcUn.add(fcI);fcKn.delete(fcI);}renderFlash();setTimeout(()=>{if(fcI<fcW.length-1){fcI++;fcF=false;renderFlash();}},250);}
+function fcSh(){fcW=sh(fcW);fcI=0;fcF=false;fcKn=new Set();fcUn=new Set();renderFlash()}
+function fcRe(){fcI=0;fcF=false;fcKn=new Set();fcUn=new Set();renderFlash()}
+function fcSU(){const u=[...fcUn].map(i=>fcW[i]);if(!u.length)return;fcW=sh(u);fcI=0;fcF=false;fcKn=new Set();fcUn=new Set();renderFlash();}
+
+// ── REVIEW ──
+function initReview(){
+  const el=document.getElementById('rmain');
+  const pool=missed.length>=4?[...new Map(missed.map(w=>[w.e,w])).values()]:sh(VOCAB).slice(0,15);
+  if(pool.length<4){el.innerHTML=`<div class="empty"><div style="font-size:32px;margin-bottom:10px">🎯</div><p>Làm bài trắc nghiệm trước để có từ cần ôn lại!</p><br><button class="btn pr" style="margin-top:10px" onclick="sw('quiz')">Bắt đầu Quiz</button></div>`;return;}
+  revW=sh(pool);revI=0;revS=0;revA=new Array(revW.length).fill(null);renderRev();
+}
+function renderRev(){
+  const el=document.getElementById('rmain');
+  if(revI>=revW.length){
+    const pct=Math.round(revS/revW.length*100);
+    el.innerHTML=`<div class="result"><div class="rscore" style="color:${pct>=70?'var(--green)':'var(--amber)'}">${revS}<span style="font-size:24px;color:var(--tx2)">/${revW.length}</span></div><div class="rmsg">${pct>=80?'Bạn đã ôn tốt!':'Hãy ôn thêm và thử lại!'}</div><div class="rbtns"><button class="btn pr" onclick="initReview()">Ôn lại</button><button class="btn" onclick="sw('quiz')">Quay lại Quiz</button></div></div>`;return;
+  }
+  const w=revW[revI];const ch=mkChoices(w);const pct=Math.round(revI/revW.length*100);
+  window._rch=ch;window._rw=w;
+  el.innerHTML=`
+<div class="revbanner">🔁 Ôn từ sai — ${revI+1}/${revW.length} từ</div>
+<div class="sbar"><div class="sc"><span class="l">Câu</span>${revI+1}/${revW.length}</div><div class="sc g">Đúng: ${revS}</div></div>
+<div class="ptrack" style="margin-bottom:.75rem"><div class="pfill" style="width:${pct}%;background:var(--amber)"></div></div>
+<div class="qcard">
+  <div class="qbadge am">Ôn từ sai</div>
+  <div class="qword">${w.e}</div>
+  <div class="qpos">(${w.p})</div>
+  <div class="choices" id="rch">
+    ${ch.map((c,i)=>`<button class="ch" id="rc${i}" onclick="revPick(${i})"><span class="ck">${KEYS[i].toUpperCase()}</span>${c}</button>`).join('')}
+  </div>
+  <div class="ares" id="rares"></div>
+</div>
+<div class="nav"><button class="btn pr ml" id="rnb" style="display:none" onclick="revI++;renderRev()">Tiếp theo →</button></div>`;
+}
+
+async function revPick(idx){
+  if(revA[revI]!==null)return;
+  const ch=window._rch,w=window._rw;
+  const ok=ch[idx]===w.v;
+  revA[revI]=ok;if(ok)revS++;
+  [0,1,2,3].forEach(i=>{const b=document.getElementById('rc'+i);if(!b)return;b.classList.add('dis');if(ch[i]===w.v)b.classList.add('ok');else if(i===idx&&!ok)b.classList.add('ng');});
+  const ares=document.getElementById('rares');
+  ares.innerHTML=`<div class="ares-hdr ${ok?'ok':'ng'}">${ok?'✓ Chính xác!':'✗ Chưa đúng!'}</div><div class="ares-body"><div class="loading-inline"><span class="sp"></span>Đang tải...</div></div>`;
+  ares.classList.add('show');
+  document.getElementById('rnb').style.display='inline-block';
+  await fetchEnrich(w.e, w.p);
+  ares.innerHTML = explHTML(w, ok, '');
+  ares.classList.add('show');
+}
+
+initQuiz();
+</script>
